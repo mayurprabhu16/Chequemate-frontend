@@ -1,0 +1,124 @@
+/* Paste into index.css. Styles the toasts rendered by ToastContext.jsx.
+   Per-toast accent color comes in via inline style / --cm-toast-accent,
+   so these rules stay generic across all 12 trip themes. */
+
+.cm-toast-viewport {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2147483000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  width: 100%;
+  max-width: 380px;
+  padding: 0 16px;
+}
+
+.cm-toast-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2147482999;
+  background: rgba(20, 14, 10, 0.18);
+  pointer-events: none;
+  animation: cm-backdrop-in 0.2s ease both;
+}
+
+.cm-toast {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #ffffff;
+  color: #2b1a14;
+  padding: 18px 40px 18px 18px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  border-left: 5px solid var(--cm-toast-accent, #b9902f);
+  box-shadow: 0 24px 48px rgba(43, 26, 20, 0.32);
+  font-size: 15px;
+  line-height: 1.4;
+  overflow: hidden;
+  pointer-events: auto;
+  width: 100%;
+  animation: cm-toast-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cm-toast-icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+.cm-toast-message {
+  flex: 1;
+  font-weight: 600;
+}
+
+.cm-toast-action {
+  flex: none;
+  background: transparent;
+  border: none;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.cm-toast-action:hover {
+  text-decoration: underline;
+}
+
+.cm-toast-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.cm-toast-close:hover {
+  color: #2b1a14;
+}
+
+.cm-toast-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  opacity: 0.4;
+  transform-origin: left;
+  animation-name: cm-toast-shrink;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes cm-toast-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes cm-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cm-toast-shrink {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}

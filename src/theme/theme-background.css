@@ -1,0 +1,28 @@
+/* Add this to index.css (or import it separately).
+   Positions the <ThemeBackground /> scene as a fixed full-viewport layer
+   behind everything else, and makes sure it never intercepts clicks. */
+
+.cm-theme-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cm-theme-bg svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Optional: fade the very top of the scene slightly so light text/headers
+   sitting near the top of the page keep good contrast on busy scenes like
+   nightlife or waterpark. Remove if you don't need it. */
+.cm-theme-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0) 220px);
+  pointer-events: none;
+}

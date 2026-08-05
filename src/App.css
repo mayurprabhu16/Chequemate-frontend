@@ -1,0 +1,488 @@
+/* =========================================================================
+   ChequeMate — Page Layouts
+   ========================================================================= */
+
+/* ---------------------------------------------------------------------- */
+/* Auth pages (Login / Register)                                          */
+/* ---------------------------------------------------------------------- */
+.cm-auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  background: var(--paper);
+}
+
+.cm-auth-brand {
+  position: relative;
+  background: var(--topbar-bg);
+  color: var(--paper-raised);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 56px;
+  overflow: hidden;
+}
+
+.cm-auth-brand::before {
+  /* faint repeating chequebook-stub perforation pattern in the backdrop */
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(232, 217, 171, 0.09) 1.5px, transparent 1.6px);
+  background-size: 22px 22px;
+  animation: cm-drift 9s linear infinite;
+  pointer-events: none;
+}
+
+.cm-brand-mark {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.02em;
+}
+
+.cm-brand-mark svg { flex: none; }
+
+.cm-brand-hero {
+  position: relative;
+  z-index: 1;
+  animation: cm-rise 0.7s cubic-bezier(.2,.7,.3,1) both;
+}
+
+.cm-brand-hero h1 {
+  font-family: var(--font-display);
+  color: var(--paper-raised);
+  font-size: 40px;
+  line-height: 1.25;
+  font-weight: 400;
+  margin-bottom: 18px;
+  max-width: 9.5ch;
+}
+
+.cm-brand-hero p {
+  color: var(--gold-soft);
+  font-size: 15.5px;
+  line-height: 1.6;
+  max-width: 34ch;
+}
+
+.cm-cheque-card {
+  position: relative;
+  z-index: 1;
+  margin-top: 40px;
+  background: rgba(244, 239, 226, 0.06);
+  border: 1px solid rgba(232, 217, 171, 0.25);
+  border-radius: 12px;
+  padding: 20px 22px;
+  animation: cm-rise 0.8s 0.15s cubic-bezier(.2,.7,.3,1) both;
+}
+
+.cm-cheque-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--gold-soft);
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(232, 217, 171, 0.2);
+}
+.cm-cheque-row:last-child { border-bottom: none; }
+.cm-cheque-row strong { color: var(--paper-raised); font-size: 15px; }
+
+.cm-auth-formside {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+}
+
+.cm-auth-card {
+  width: 100%;
+  max-width: 400px;
+  animation: cm-rise 0.5s cubic-bezier(.2,.7,.3,1) both;
+}
+
+.cm-auth-card h2 {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+
+.cm-auth-subtitle {
+  color: var(--ink-soft);
+  font-size: 14.5px;
+  margin-bottom: 28px;
+}
+
+.cm-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cm-error-banner {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-radius: 7px;
+  background: var(--owe-bg);
+  color: var(--owe);
+  font-size: 13.5px;
+  border: 1px solid rgba(179, 64, 47, 0.25);
+  animation: cm-rise 0.3s ease both;
+}
+
+.cm-auth-footer {
+  margin-top: 24px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+.cm-auth-footer a {
+  color: var(--cover);
+  font-weight: 700;
+  text-decoration: none;
+  position: relative;
+}
+.cm-auth-footer a::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: -2px;
+  height: 1.5px; background: var(--gold);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.2s ease;
+}
+.cm-auth-footer a:hover::after { transform: scaleX(1); }
+
+@media (max-width: 860px) {
+  .cm-auth-page { grid-template-columns: 1fr; }
+  .cm-auth-brand { padding: 36px 28px; min-height: 240px; }
+  .cm-brand-hero h1 { font-size: 30px; }
+  .cm-cheque-card { margin-top: 24px; }
+  .cm-auth-formside { padding: 32px 24px; }
+}
+
+@media (max-width: 480px) {
+  .cm-auth-brand { padding: 28px 20px; min-height: 210px; }
+  .cm-brand-mark { font-size: 18px; }
+  .cm-brand-hero h1 { font-size: 24px; max-width: none; }
+  .cm-brand-hero p { font-size: 14px; max-width: none; }
+  .cm-cheque-card { padding: 16px 18px; margin-top: 20px; }
+  .cm-cheque-row { font-size: 12px; }
+  .cm-auth-formside { padding: 28px 16px; }
+  .cm-auth-card h2 { font-size: 22px; }
+}
+
+/* ---------------------------------------------------------------------- */
+/* App shell / topbar shared by Dashboard + GroupDetails                   */
+/* ---------------------------------------------------------------------- */
+.cm-shell {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 28px 24px 64px;
+  min-height: 100vh;
+}
+
+@media (max-width: 640px) {
+  .cm-shell { padding: 18px 14px 48px; }
+}
+
+.cm-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--topbar-bg);
+  color: var(--paper-raised);
+  border-radius: 12px;
+  padding: 18px 24px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-card);
+  animation: cm-rise 0.4s cubic-bezier(.2,.7,.3,1) both;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.cm-topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 400;
+}
+
+.cm-topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--gold-soft);
+  flex-wrap: wrap;
+}
+.cm-topbar-user strong { color: var(--paper-raised); }
+
+.cm-back-link {
+  background: none;
+  border: none;
+  color: var(--cover);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.15s ease;
+}
+.cm-back-link:hover { transform: translateX(-3px); }
+
+/* ---------------------------------------------------------------------- */
+/* Dashboard                                                                */
+/* ---------------------------------------------------------------------- */
+.cm-toprow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cm-empty-state {
+  border: 1.5px dashed var(--line);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--ink-soft);
+  animation: cm-rise 0.4s ease both;
+}
+
+.cm-group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 560px) {
+  .cm-group-grid { grid-template-columns: 1fr; }
+}
+
+.cm-group-card {
+  position: relative;
+  background: var(--paper-raised);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.22s cubic-bezier(.2,.7,.3,1), box-shadow 0.22s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  /* torn-stub top edge via a jagged mask */
+  --tear: conic-gradient(from 45deg at 4px 4px, transparent 90deg, #000 0);
+  overflow: hidden;
+}
+
+.cm-group-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: repeating-linear-gradient(
+    to right, var(--gold) 0 10px, transparent 10px 18px
+  );
+  opacity: 0.55;
+}
+
+.cm-group-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px -14px rgba(31, 43, 36, 0.28);
+}
+
+.cm-group-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cm-group-card h4 { font-size: 16.5px; }
+
+.cm-group-actions { display: flex; gap: 4px; flex: none; }
+.cm-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 5px;
+  transition: background-color 0.15s ease;
+}
+.cm-icon-btn--edit { color: var(--cover); }
+.cm-icon-btn--edit:hover { background: rgba(22, 52, 42, 0.08); }
+.cm-icon-btn--delete { color: var(--owe); }
+.cm-icon-btn--delete:hover { background: var(--owe-bg); }
+
+.cm-badge-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------------------------------------------------------------------- */
+/* Group details                                                           */
+/* ---------------------------------------------------------------------- */
+.cm-mode-pill {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--gold-soft);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.cm-mode-pill strong { color: var(--paper-raised); }
+
+.cm-page-title {
+  font-size: 27px;
+  margin: 4px 0 24px;
+}
+
+.cm-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.cm-col { display: flex; flex-direction: column; gap: 18px; }
+
+.cm-accordion-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cm-accordion-body {
+  overflow: hidden;
+  animation: cm-rise 0.25s ease both;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+
+.cm-member-list, .cm-balance-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 9px;
+}
+
+.cm-member-item, .cm-balance-item {
+  background: var(--paper);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  transition: background-color 0.15s ease;
+}
+.cm-member-item:hover, .cm-balance-item:hover { background: var(--gold-soft); background: rgba(185, 144, 47, 0.08); }
+
+.cm-balance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cm-you-badge { font-size: 11.5px; color: var(--cover); font-weight: 700; margin-left: 4px; }
+.cm-member-email { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+.cm-inline-form { display: flex; gap: 8px; }
+.cm-inline-form .cm-input { flex: 1; min-width: 0; }
+
+@media (max-width: 420px) {
+  .cm-inline-form { flex-direction: column; }
+  .cm-inline-form .cm-btn { width: 100%; }
+}
+
+.cm-split-box {
+  background: var(--paper);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  animation: cm-rise 0.25s ease both;
+}
+.cm-split-box-label {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.cm-split-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cm-split-name { font-size: 13.5px; color: var(--ink); }
+.cm-split-input {
+  width: 108px;
+  max-width: 40%;
+  padding: 7px 9px;
+  border-radius: 5px;
+  border: 1.5px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: right;
+  background: var(--paper-raised);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.cm-split-input:focus { border-color: var(--cover); }
+
+.cm-expense-list { display: flex; flex-direction: column; gap: 12px; }
+.cm-expense-card {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: 9px;
+  padding: 14px 16px;
+  animation: cm-rise 0.35s cubic-bezier(.2,.7,.3,1) both;
+  transition: box-shadow 0.2s ease;
+}
+.cm-expense-card:hover { box-shadow: var(--shadow-card); }
+.cm-expense-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.cm-expense-desc { font-size: 15.5px; margin-bottom: 3px; }
+.cm-expense-payer { font-size: 12px; color: var(--ink-soft); }
+.cm-expense-actions { display: flex; justify-content: flex-end; margin-top: 6px; }
+
+@media (max-width: 780px) {
+  .cm-detail-grid { grid-template-columns: 1fr; }
+  .cm-topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+
+@media (max-width: 480px) {
+  .cm-page-title { font-size: 21px; margin: 4px 0 18px; }
+  .cm-card { padding: 16px; }
+  .cm-card-title { font-size: 15.5px; }
+  .cm-topbar { padding: 14px 16px; border-radius: 10px; }
+  .cm-topbar-title { font-size: 16px; }
+  .cm-mode-pill { font-size: 11px; flex-wrap: wrap; }
+  .cm-expense-main { flex-direction: column; gap: 4px; }
+  .cm-figure { font-size: 15px; }
+  .cm-toprow h3 { font-size: 16px; }
+}
+/* 1. Ensure the container establishes a clean relative positioning */
+.cm-theme-picker {
+  position: relative !important;
+  display: inline-block !important;
+  z-index: 1000 !important;
+}
+
+/* 2. Force the dropdown menu to float cleanly on top of all dashboard cards */
+.cm-theme-menu {
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  z-index: 2147483647 !important; /* Maximum CSS z-index */
+  background-color: #ffffff !important;
+  border-radius: 16px !important;
+  padding: 20px !important;
+  width: 320px !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35) !important;
+}

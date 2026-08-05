@@ -1,0 +1,549 @@
+/* =========================================================================
+   ChequeMate — Design System
+   Concept: the group ledger as a chequebook. Cards read like cheque stubs
+   (dashed perforation + torn edge), actions read like rubber stamps,
+   figures are set in a monospace "ledger" face with tabular numerals.
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* -- Palette -------------------------------------------------------- */
+  --paper:        #f4efe2;   /* ledger paper */
+  --paper-raised: #fffdf7;   /* card surface, slightly brighter than paper */
+  --ink:          #1f2b24;   /* near-black ink, warm green-black */
+  --ink-soft:     #5c6b61;   /* secondary ink */
+  --ink-faint:    #8b978d;   /* tertiary / placeholder */
+  --cover:        #16342a;   /* chequebook cover green */
+  --cover-deep:   #0e241d;
+  --gold:         #b9902f;   /* foil / seal accent */
+  --gold-soft:    #e8d9ab;
+  --owe:          #b3402f;   /* stamp red — money owed */
+  --owe-bg:       #f7e6e1;
+  --settled:      #2f7a58;   /* stamp green — settled / paid */
+  --settled-bg:   #e2efe6;
+  --line:         #d9d2bd;   /* hairline / dashed perforation */
+  --shadow-card:  0 1px 2px rgba(31, 43, 36, 0.06), 0 8px 20px -10px rgba(31, 43, 36, 0.18);
+  --shadow-pop:   0 20px 60px -15px rgba(14, 36, 29, 0.45);
+  --topbar-bg:    linear-gradient(160deg, var(--cover) 0%, var(--cover-deep) 100%);
+
+  --font-display: 'Special Elite', 'Courier New', monospace;
+  --font-body: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(185, 144, 47, 0.06), transparent 60%),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+.cm-topbar, .cm-auth-brand, .cm-card, .cm-group-card, .cm-modal,
+.cm-expense-card, .cm-member-item, .cm-balance-item, .cm-split-box {
+  transition-property: background-color, background-image, border-color, box-shadow, transform;
+  transition-duration: 0.4s, 0.4s, 0.3s, 0.25s, 0.22s;
+  transition-timing-function: ease;
+}
+
+/* Faint ledger-line texture across the whole app */
+#root {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 37px,
+    rgba(92, 107, 97, 0.055) 38px
+  );
+  background-attachment: local;
+}
+
+h1, h2, h3, h4 { margin: 0; color: var(--ink); font-weight: 700; }
+p { margin: 0; }
+button { font-family: inherit; }
+input, select { font-family: var(--font-body); }
+
+::selection { background: var(--gold-soft); color: var(--ink); }
+
+/* -------------------------------------------------------------------- */
+/* Motion — respected globally, disabled for reduced-motion users        */
+/* -------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes cm-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cm-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes cm-pop {
+  0%   { opacity: 0; transform: translateY(10px) scale(0.97); }
+  60%  { opacity: 1; transform: translateY(0) scale(1.008); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes cm-stamp {
+  0%   { transform: scale(1) rotate(0deg); }
+  40%  { transform: scale(0.93) rotate(-2deg); }
+  70%  { transform: scale(1.03) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes cm-underline {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes cm-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cm-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 120px 0; }
+}
+
+.cm-stagger > * {
+  animation: cm-rise 0.55s cubic-bezier(.2,.7,.3,1) both;
+}
+.cm-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.cm-stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.cm-stagger > *:nth-child(3) { animation-delay: 0.14s; }
+.cm-stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.cm-stagger > *:nth-child(5) { animation-delay: 0.26s; }
+.cm-stagger > *:nth-child(6) { animation-delay: 0.32s; }
+
+/* -------------------------------------------------------------------- */
+/* Buttons — behave like rubber stamps on a chequebook counter           */
+/* -------------------------------------------------------------------- */
+.cm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px solid transparent;
+  border-radius: 7px;
+  padding: 11px 18px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  white-space: nowrap;
+}
+.cm-btn:active:not(:disabled) { animation: cm-stamp 0.35s ease; }
+.cm-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.cm-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.cm-btn--primary {
+  background: var(--cover);
+  color: var(--paper-raised);
+  box-shadow: var(--shadow-card);
+}
+.cm-btn--primary:hover:not(:disabled) {
+  background: var(--cover-deep);
+  box-shadow: 0 10px 22px -10px rgba(14, 36, 29, 0.55);
+  transform: translateY(-1px);
+}
+
+.cm-btn--gold {
+  background: var(--gold);
+  color: var(--cover-deep);
+}
+.cm-btn--gold:hover:not(:disabled) { background: #a67f29; transform: translateY(-1px); }
+
+.cm-btn--ghost {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+.cm-btn--ghost:hover:not(:disabled) { border-color: var(--ink-soft); color: var(--ink); }
+
+.cm-btn--text {
+  background: transparent;
+  border: none;
+  padding: 4px 6px;
+  color: var(--cover);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+}
+.cm-btn--text:hover:not(:disabled) { text-decoration: underline; }
+
+.cm-btn--danger-text {
+  background: transparent;
+  border: none;
+  padding: 4px 6px;
+  color: var(--owe);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+}
+.cm-btn--danger-text:hover:not(:disabled) { text-decoration: underline; }
+
+.cm-btn--full { width: 100%; padding: 13px; font-size: 14px; }
+
+@media (max-width: 360px) {
+  .cm-btn { white-space: normal; text-align: center; letter-spacing: 0.03em; }
+}
+
+/* -------------------------------------------------------------------- */
+/* Inputs                                                                */
+/* -------------------------------------------------------------------- */
+.cm-field { display: flex; flex-direction: column; gap: 6px; }
+.cm-label {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.cm-input, .cm-select {
+  padding: 11px 13px;
+  border-radius: 6px;
+  border: 1.5px solid var(--line);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-size: 14.5px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  width: 100%;
+}
+.cm-input::placeholder { color: var(--ink-faint); }
+.cm-input:focus, .cm-select:focus {
+  border-color: var(--cover);
+  box-shadow: 0 0 0 3px rgba(22, 52, 42, 0.1);
+}
+.cm-select { cursor: pointer; }
+
+@media (max-width: 480px) {
+  .cm-input, .cm-select { font-size: 16px; padding: 10px 12px; }
+}
+
+.cm-input:-webkit-autofill,
+.cm-input:-webkit-autofill:hover,
+.cm-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink);
+  transition: background-color 9999s ease-in-out 0s;
+  box-shadow: 0 0 0px 1000px var(--paper-raised) inset;
+  border-color: var(--cover);
+}
+
+/* -------------------------------------------------------------------- */
+/* Cards — cheque stub: dashed perforation on the left + torn top edge   */
+/* -------------------------------------------------------------------- */
+.cm-card {
+  position: relative;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-left: 3px dashed var(--gold-soft);
+  border-radius: 10px;
+  padding: 22px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-left-color 0.25s ease;
+}
+.cm-card:hover { border-left-color: var(--gold); }
+
+.cm-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cm-card-title::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex: none;
+}
+
+.cm-muted { color: var(--ink-soft); font-size: 14px; }
+
+/* -------------------------------------------------------------------- */
+/* Badges / pills / stamps                                              */
+/* -------------------------------------------------------------------- */
+.cm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: var(--settled-bg);
+  color: var(--settled);
+  border: 1px solid rgba(47, 122, 88, 0.25);
+}
+.cm-badge--neutral {
+  background: rgba(92, 107, 97, 0.1);
+  color: var(--ink-soft);
+  border-color: var(--line);
+}
+.cm-badge--gold {
+  background: rgba(185, 144, 47, 0.14);
+  color: #8a6a20;
+  border-color: rgba(185, 144, 47, 0.35);
+}
+
+.cm-figure { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.cm-figure--owe { color: var(--owe); font-weight: 700; }
+.cm-figure--settled { color: var(--settled); font-weight: 700; }
+
+/* -------------------------------------------------------------------- */
+/* Modal — a cheque unfolding from the book                             */
+/* -------------------------------------------------------------------- */
+.cm-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(14, 36, 29, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  animation: cm-fade 0.2s ease both;
+  padding: 20px;
+}
+.cm-modal {
+  width: 100%; max-width: 400px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: var(--paper-raised);
+  border-radius: 12px;
+  padding: 26px;
+  box-shadow: var(--shadow-pop);
+  animation: cm-pop 0.35s cubic-bezier(.2,.8,.3,1) both;
+  border-top: 4px solid var(--gold);
+}
+
+@media (max-width: 480px) {
+  .cm-modal { padding: 20px; border-radius: 10px; }
+}
+
+/* -------------------------------------------------------------------- */
+/* Spinner (used inline in loading buttons, decorative)                  */
+/* -------------------------------------------------------------------- */
+.cm-dot-spin {
+  display: inline-block;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: currentColor;
+  animation: cm-spin 0.7s linear infinite;
+}
+
+/* =========================================================================
+   Destination themes
+   Swapping [data-theme] on <html> re-derives the whole palette. Semantic
+   colors (ink, owed/settled reds & greens) stay fixed on purpose so debts
+   and balances always read the same way no matter the trip theme.
+   ========================================================================= */
+
+:root[data-theme='mountains'] {
+  --cover: #1f2d3d; --cover-deep: #141d29;
+  --gold: #7fae8f; --gold-soft: #d7ecdc;
+  --paper: #eef1ec; --paper-raised: #fbfdfa;
+  --topbar-bg: linear-gradient(120deg, #2c3e50 0%, #3a506b 50%, #1f2d3d 100%);
+}
+
+:root[data-theme='beach'] {
+  --cover: #0d5c63; --cover-deep: #073e42;
+  --gold: #e39a1d; --gold-soft: #ffe3a3;
+  --paper: #fdf6e9; --paper-raised: #fffaf0;
+  --topbar-bg: linear-gradient(120deg, #0f8b8d 0%, #0d5c63 55%, #073e42 100%);
+}
+
+:root[data-theme='waterpark'] {
+  --cover: #0077b6; --cover-deep: #023e73;
+  --gold: #e6b800; --gold-soft: #fff2b0;
+  --paper: #eaf7fb; --paper-raised: #f7fdff;
+  --topbar-bg: linear-gradient(120deg, #00b4d8 0%, #0077b6 55%, #023e73 100%);
+}
+
+:root[data-theme='desert'] {
+  --cover: #6b4226; --cover-deep: #4a2c17;
+  --gold: #c98a3f; --gold-soft: #f6dcb2;
+  --paper: #faf3e4; --paper-raised: #fffaf1;
+  --topbar-bg: linear-gradient(120deg, #a9714b 0%, #6b4226 55%, #4a2c17 100%);
+}
+
+:root[data-theme='forest'] {
+  --cover: #22391f; --cover-deep: #152413;
+  --gold: #74a350; --gold-soft: #d4e8bf;
+  --paper: #f1f5ea; --paper-raised: #fbfdf8;
+  --topbar-bg: linear-gradient(120deg, #355e33 0%, #22391f 55%, #152413 100%);
+}
+
+:root[data-theme='snow'] {
+  --cover: #263a4a; --cover-deep: #172530;
+  --gold: #5fa9c7; --gold-soft: #d9eef7;
+  --paper: #f0f6fa; --paper-raised: #fbfdff;
+  --topbar-bg: linear-gradient(120deg, #3a5568 0%, #263a4a 55%, #172530 100%);
+}
+
+:root[data-theme='lake'] {
+  --cover: #14464d; --cover-deep: #0c2f34;
+  --gold: #2f92a8; --gold-soft: #c3e8f0;
+  --paper: #eef7f8; --paper-raised: #f8fdfd;
+  --topbar-bg: linear-gradient(120deg, #1c6570 0%, #14464d 55%, #0c2f34 100%);
+}
+
+:root[data-theme='nightlife'] {
+  --cover: #1a1030; --cover-deep: #100a1f;
+  --gold: #d63e8c; --gold-soft: #ffc4dd;
+  --paper: #f2eefb; --paper-raised: #faf8ff;
+  --topbar-bg: linear-gradient(120deg, #3c1361 0%, #1a1030 55%, #100a1f 100%);
+}
+
+:root[data-theme='countryside'] {
+  --cover: #4a3728; --cover-deep: #33251a;
+  --gold: #b9822f; --gold-soft: #f0d9a8;
+  --paper: #faf6ea; --paper-raised: #fffcf4;
+  --topbar-bg: linear-gradient(120deg, #6b4f34 0%, #4a3728 55%, #33251a 100%);
+}
+
+:root[data-theme='cruise'] {
+  --cover: #071e3d; --cover-deep: #04122a;
+  --gold: #d9853f; --gold-soft: #fbd7b5;
+  --paper: #eef3f8; --paper-raised: #f8fbfd;
+  --topbar-bg: linear-gradient(120deg, #0b3d68 0%, #071e3d 55%, #04122a 100%);
+}
+
+:root[data-theme='roadtrip'] {
+  --cover: #2b1b17; --cover-deep: #1a0f0c;
+  --gold: #e2653a; --gold-soft: #ffc9b3;
+  --paper: #f6efe6; --paper-raised: #fffaf5;
+  --topbar-bg: linear-gradient(120deg, #5c2d1c 0%, #2b1b17 55%, #1a0f0c 100%);
+}
+
+/* -------------------------------------------------------------------- */
+/* Theme picker                                                          */
+/* -------------------------------------------------------------------- */
+.cm-theme-picker { position: relative; }
+
+.cm-theme-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  color: var(--paper-raised);
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.cm-theme-trigger:hover { background: rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
+.cm-theme-trigger:active { animation: cm-stamp 0.3s ease; }
+.cm-theme-trigger-emoji { font-size: 15px; }
+.cm-theme-trigger-caret { font-size: 9px; opacity: 0.75; }
+
+.cm-theme-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: var(--paper-raised);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow-pop);
+  border-top: 4px solid var(--gold);
+  z-index: 60;
+  width: 300px;
+  animation: cm-pop 0.25s cubic-bezier(.2,.8,.3,1) both;
+}
+
+.cm-theme-menu-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+
+.cm-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.cm-theme-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  animation: cm-rise 0.3s ease both;
+}
+.cm-theme-swatch:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 16px -6px rgba(0,0,0,0.35); }
+.cm-theme-swatch:active { animation: cm-stamp 0.35s ease; }
+.cm-theme-swatch--active { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(255,255,255,0.5) inset; }
+.cm-theme-swatch-emoji { font-size: 18px; text-shadow: none; }
+
+.cm-swatch-classic     { background: linear-gradient(135deg, #16342a, #0e241d); }
+.cm-swatch-mountains   { background: linear-gradient(135deg, #2c3e50, #3a506b, #1f2d3d); }
+.cm-swatch-beach       { background: linear-gradient(135deg, #0f8b8d, #0d5c63, #073e42); }
+.cm-swatch-waterpark   { background: linear-gradient(135deg, #00b4d8, #0077b6, #023e73); }
+.cm-swatch-desert      { background: linear-gradient(135deg, #c98a3f, #6b4226, #4a2c17); }
+.cm-swatch-forest      { background: linear-gradient(135deg, #4c7a3f, #22391f, #152413); }
+.cm-swatch-snow        { background: linear-gradient(135deg, #5fa9c7, #263a4a, #172530); }
+.cm-swatch-lake        { background: linear-gradient(135deg, #2f92a8, #14464d, #0c2f34); }
+.cm-swatch-nightlife   { background: linear-gradient(135deg, #d63e8c, #3c1361, #100a1f); }
+.cm-swatch-countryside { background: linear-gradient(135deg, #b9822f, #4a3728, #33251a); }
+.cm-swatch-cruise      { background: linear-gradient(135deg, #d9853f, #071e3d, #04122a); }
+.cm-swatch-roadtrip    { background: linear-gradient(135deg, #e2653a, #2b1b17, #1a0f0c); }
+
+@media (max-width: 480px) {
+  .cm-theme-menu { position: fixed; left: 50%; right: auto; top: auto; bottom: 16px; transform: translateX(-50%); width: min(320px, 92vw); }
+  .cm-theme-trigger-label { display: none; }
+}
+
+
