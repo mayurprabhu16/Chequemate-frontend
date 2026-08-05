@@ -23,28 +23,28 @@ const Login = () => {
 
       console.log('Backend response:', response.data);
 
-      // 1. Extract Token safely (top level or nested)
-      const token =
-        response.data.token ||
-        response.data.jwt ||
-        response.data.accessToken ||
-        response.data.jwtToken;
+      const userData = response.data;
 
-      // 2. Extract User Details safely (handles nested user object or root response)
-      const userData = response.data.user || response.data;
+      // Extract user fields safely from response payload
       const userId = userData.userId || userData.id;
-      const name = userData.name || userData.username;
+      const name = userData.name;
       const userEmail = userData.email || email;
 
-      if (!token) {
-        throw new Error('No token provided by server response.');
-      }
+      // Extract token if present, or assign fallback if backend doesn't use JWT
+      const token =
+        userData.token ||
+        userData.jwt ||
+        userData.accessToken ||
+        userData.jwtToken ||
+        'session_authenticated';
 
-      // Pass user object and token to AuthContext
+      // Store in AuthContext
       login({ userId, name, email: userEmail }, token);
 
+      // Redirect to dashboard
       navigate('/dashboard');
     } catch (err) {
+      console.error('Login submit error:', err);
       if (err.response && err.response.data) {
         setError(
           typeof err.response.data === 'string'
@@ -52,7 +52,7 @@ const Login = () => {
             : err.response.data.message || 'Invalid email or password.'
         );
       } else {
-        setError('Server error. Please try again later.');
+        setError(err.message || 'Server error. Please try again later.');
       }
     } finally {
       setLoading(false);
