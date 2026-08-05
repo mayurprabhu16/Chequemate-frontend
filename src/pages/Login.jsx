@@ -21,13 +21,36 @@ const Login = () => {
     try {
       const response = await api.post('/auth/login', { email, password });
 
-      const { token, userId, name, email: userEmail } = response.data;
+      console.log('Backend response:', response.data);
+
+      // 1. Extract Token safely (top level or nested)
+      const token =
+        response.data.token ||
+        response.data.jwt ||
+        response.data.accessToken ||
+        response.data.jwtToken;
+
+      // 2. Extract User Details safely (handles nested user object or root response)
+      const userData = response.data.user || response.data;
+      const userId = userData.userId || userData.id;
+      const name = userData.name || userData.username;
+      const userEmail = userData.email || email;
+
+      if (!token) {
+        throw new Error('No token provided by server response.');
+      }
+
+      // Pass user object and token to AuthContext
       login({ userId, name, email: userEmail }, token);
 
       navigate('/dashboard');
     } catch (err) {
       if (err.response && err.response.data) {
-        setError(typeof err.response.data === 'string' ? err.response.data : 'Invalid email or password.');
+        setError(
+          typeof err.response.data === 'string'
+            ? err.response.data
+            : err.response.data.message || 'Invalid email or password.'
+        );
       } else {
         setError('Server error. Please try again later.');
       }
