@@ -308,22 +308,33 @@ const GroupDetails = () => {
             )}
           </div>
 
-          {/* Simplified Balances Card */}
+          {/* Simplified Balances Card - FIXED GRAMMAR (" You owe " vs " Name owes ") */}
           <div className="cm-card">
             <h3 className="cm-card-title">Simplified balances</h3>
             {balances.length === 0 ? (
               <p className="cm-muted">All settled up! No active debts in this group.</p>
             ) : (
               <ul className="cm-balance-list">
-                {balances.map((b, idx) => (
-                  <li key={idx} className="cm-balance-item">
-                    <span>
-                      <strong>{b.fromUserId === activeUserId ? 'You' : b.fromUserName}</strong> owes{' '}
-                      <strong>{b.toUserId === activeUserId ? 'You' : b.toUserName}</strong>
-                    </span>
-                    <strong className="cm-figure cm-figure--owe">₹{parseFloat(b.amount || 0).toFixed(2)}</strong>
-                  </li>
-                ))}
+                {balances.map((b, idx) => {
+                  const isDebtorYou = b.fromUserId === activeUserId || b.fromUserName === 'You';
+                  const isCreditorYou = b.toUserId === activeUserId || b.toUserName === 'You';
+
+                  const debtorLabel = isDebtorYou ? 'You' : b.fromUserName;
+                  const creditorLabel = isCreditorYou ? 'You' : b.toUserName;
+                  const verb = isDebtorYou ? 'owe' : 'owes';
+
+                  return (
+                    <li key={idx} className="cm-balance-item">
+                      <span>
+                        <strong>{debtorLabel}</strong> {verb}{' '}
+                        <strong>{creditorLabel}</strong>
+                      </span>
+                      <strong className="cm-figure cm-figure--owe">
+                        ₹{parseFloat(b.amount || 0).toFixed(2)}
+                      </strong>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>
