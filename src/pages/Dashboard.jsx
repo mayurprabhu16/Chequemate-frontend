@@ -79,7 +79,7 @@ const Dashboard = () => {
       const res = await api.post('/groups', {
         name: groupName,
         mode: groupMode,
-        createdByUserId: currentId
+        userId: currentId // Aligned key with backend payload reader
       });
 
       setGroupName('');
